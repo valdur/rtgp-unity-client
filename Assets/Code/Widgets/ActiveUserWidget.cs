@@ -12,7 +12,7 @@ public class ActiveUserWidget : MonoBehaviour, IDropHandler {
 
 	// Use this for initialization
 	void Start() {
-		instance = this;
+		instance = this; 
 		Load(null);
 		logOutButton.onClick.AddListener(Logout);
 	}

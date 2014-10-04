@@ -11,7 +11,7 @@ public class GuiController : MonoBehaviour {
 	public static GuiController instance;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		instance = this;
 	}
 }
