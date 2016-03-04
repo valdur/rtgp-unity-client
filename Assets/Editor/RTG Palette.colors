@@ -14,3 +14,7 @@ MonoBehaviour:
   m_Presets:
   - m_Name: 
     m_Color: {r: 1, g: 1, b: 1, a: 1}
+  - m_Name: 
+    m_Color: {r: 0, g: .503448486, b: 1, a: 1}
+  - m_Name: 
+    m_Color: {r: 1, g: .641379356, b: 0, a: .298039228}

@@ -11,7 +11,7 @@ public class UserListWidget : MonoBehaviour{
 
 	// Use this for initialization
 	IEnumerator Start () {
-		var www = new WWW("http://192.168.0.11:8080/users.json");
+		var www = new WWW(NetworkingManager.instance.serverAddress + "/users.json");
 		yield return www;
 		if (!string.IsNullOrEmpty(www.error)) {
 			Debug.LogError(www.error);
