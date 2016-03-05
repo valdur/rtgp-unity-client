@@ -36,7 +36,7 @@ public class ActiveUserWidget : MonoBehaviour, IDropHandler {
 		GuiController.instance.currentUser = userData;
 		logOutButton.gameObject.SetActive(userData != null);
 		if (userData != null) {
-			nameLabel.text = userData.name;
+			nameLabel.text = userData.username;
 		} else {
 			nameLabel.text = "Not logged in";
 		}

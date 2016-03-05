@@ -12,8 +12,8 @@ public class UserDataWidget : MonoBehaviour, IDropHandler {
 
 	public void Load(UserData data ) {
 		mUserData = data;
-		nameLabel.text = data.name;
-		idLabel.text = data.id;
+		nameLabel.text = data.username;
+		idLabel.text = data._id;
 		emailLabel.text = data.email;
 		roleLabel.text = data.role;
 	}
