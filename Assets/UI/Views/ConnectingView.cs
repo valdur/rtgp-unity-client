@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class ConnectingView : MonoBehaviour {
+public class ConnectingView : View {
 
     [SerializeField]
     Text failLabel;
@@ -17,11 +17,11 @@ public class ConnectingView : MonoBehaviour {
     public void ConnectOrReconnect() {
         failLabel.gameObject.SetActive(false);
         retryButton.gameObject.SetActive(false);
-        MeteorDAO.instance.Connect(ConnectSuccessful, ConnectFail);
+        MeteorAccess.instance.Connect(ConnectSuccessful, ConnectFail);
     }
 
     public void ConnectSuccessful() {
-        gameObject.SetActive(false);
+        ViewsController.instance.ShowView<LoginView>();
     }
 
     public void ConnectFail() {

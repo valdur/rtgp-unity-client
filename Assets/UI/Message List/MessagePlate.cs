@@ -3,20 +3,22 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class UserPlateWidget : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler {
+using Rtgp.DataModel;
+
+public class MessagePlate : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler {
 
 	[System.NonSerialized]
-	public UserData userData;
+	public MessageData messageData;
 	public Text label;
 	Dragling mDragling;
 
-	public void Load(UserData user) {
-		userData = user;
-		label.text = user.username;
+	internal void Load(MessageData message) {
+		messageData = message;
+		label.text = message.content;
 	}
 
 	public void OnBeginDrag(PointerEventData eventData) {
-		mDragling = GuiController.instance.draglingPrefab.Create(userData.username, eventData.position);
+		mDragling = ViewsController.instance.draglingPrefab.Create(messageData.content, eventData.position);
 	}
 
 	public void OnDrag(PointerEventData eventData) {

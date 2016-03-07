@@ -11,7 +11,7 @@ public class BookmarkWidget : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 	Dragling mDragling;
 
 	public void OnBeginDrag(PointerEventData eventData) {
-		mDragling = GuiController.instance.draglingPrefab.Create(prefab.name, eventData.position);
+		mDragling = ViewsController.instance.draglingPrefab.Create(prefab.name, eventData.position);
 	}
 
 	public void OnDrag(PointerEventData eventData) {

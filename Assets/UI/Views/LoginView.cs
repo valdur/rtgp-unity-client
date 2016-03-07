@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class LoginView : MonoBehaviour {
+public class LoginView : View {
 
     [SerializeField]
     InputField emailInput;
@@ -19,15 +19,17 @@ public class LoginView : MonoBehaviour {
     public void Start() {
         loginFailedLabel.gameObject.SetActive(false);
         loginButton.onClick.AddListener(Login);
+
+        MeteorAccess.instance.Login("valdur", "fdsafdsa", LoginSuccessfulHandler, LoginFailedHandler);
     }
 
     public void Login() {
         loginFailedLabel.gameObject.SetActive(false);
-        MeteorDAO.instance.Login(emailInput.text, passInput.text, LoginSuccessfulHandler, LoginFailedHandler);
+        MeteorAccess.instance.Login(emailInput.text, passInput.text, LoginSuccessfulHandler, LoginFailedHandler);
     }
 
     void LoginSuccessfulHandler() {
-        gameObject.SetActive(false);
+        ViewsController.instance.ShowView<GameView>();
     }
 
     void LoginFailedHandler() {

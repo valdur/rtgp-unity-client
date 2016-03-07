@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine.EventSystems;
 
-public class UserListWidget : MonoBehaviour {
+public class UserList : MonoBehaviour {
 
-    public UserPlateWidget userPlateWidget;
+    public UserPlate userPlateWidget;
     public Transform listContent;
 
     // Use this for initialization
     void Start() {
-        foreach (var up in MeteorDAO.instance.users) {
-            var uw = Instantiate(userPlateWidget) as UserPlateWidget;
+        foreach (var up in MeteorAccess.instance.GetUsers()) {
+            var uw = Instantiate(userPlateWidget) as UserPlate;
             uw.Load(up);
-            uw.transform.parent = listContent;
+            uw.transform.SetParent(listContent);
         }
     }
 }
