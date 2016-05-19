@@ -2,7 +2,7 @@
 using System.Collections;
 using Meteor;
 
-namespace Rtgp.DataModel {
+namespace Wtg.DataModel {
     public class MessageData : MongoDocument {
 
         public string sender;

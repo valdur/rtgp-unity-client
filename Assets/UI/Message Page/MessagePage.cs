@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
-using Rtgp.DataModel;
+using Wtg.DataModel;
 
 public class MessagePage : MonoBehaviour {
 

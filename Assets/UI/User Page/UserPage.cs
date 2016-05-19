@@ -4,6 +4,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 
+using Wtg.DataModel;
+
 public class UserPage : MonoBehaviour, IDropHandler {
     public Text nameLabel;
     public Text idLabel;

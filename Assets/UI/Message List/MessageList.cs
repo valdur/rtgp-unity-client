@@ -2,7 +2,7 @@
 using System.Collections;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using Rtgp.DataModel;
+using Wtg.DataModel;
 
 public class MessageList : MonoBehaviour {
 

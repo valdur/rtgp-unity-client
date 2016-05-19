@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Wtg.DataModel;
 
 public class ActiveUserWidget : MonoBehaviour, IDropHandler {
 

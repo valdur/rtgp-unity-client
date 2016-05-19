@@ -2,13 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Rtgp.DataModel;
+using Wtg.DataModel;
 using Meteor.Extensions;
 using System;
 
 public class MeteorAccess : MonoBehaviour {
 
-    string serverAddress = "ws://192.168.0.107:3000/websocket";
+    public string serverAddress = "ws://seriousdragon.com:3000/websocket";
     public static MeteorAccess instance;
 
     void Awake() {
