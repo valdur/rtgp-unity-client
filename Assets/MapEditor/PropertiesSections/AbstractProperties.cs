@@ -5,7 +5,7 @@ namespace Wtg.MapEditor {
     public abstract class AbstractProperties : MonoBehaviour {
 
         [SerializeField]
-        protected MapMainController map;
+        protected MapController map;
 
         protected virtual void Awake() {
             map.SelectionChangedEvent += SelectionChangedHandler;

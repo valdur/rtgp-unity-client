@@ -13,7 +13,7 @@ namespace Wtg.MapEditor {
         Image bg;
 
         MapCanvas canvas;
-        MapMainController map;
+        MapController map;
         public ConnectionData data { get; private set; }
         RectTransform rectTransform;
         private bool _selected;
@@ -29,7 +29,7 @@ namespace Wtg.MapEditor {
         }
 
         void SetupColor() {
-            bg.color = _selected ? canvas.selectedRegionColor : canvas.deselectedRegionColor;
+            bg.color = _selected ? canvas.selectedConnectionColor : canvas.deselectedConnectionColor;
         }
 
         internal void Load(MapCanvas mapCanvas, ConnectionData connection) {
@@ -40,6 +40,10 @@ namespace Wtg.MapEditor {
 
             map.RegionUpdatedEvent += RegionUpdatedHandler;
             RecalculatePosition();
+        }
+
+        void OnDestroy() {
+            map.RegionUpdatedEvent -= RegionUpdatedHandler;
         }
 
         void RecalculatePosition() {

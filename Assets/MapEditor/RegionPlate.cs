@@ -32,15 +32,15 @@ namespace Wtg.MapEditor {
             }
         }
 
-        public RegionData regionData { get; private set; }
+        public RegionData data { get; private set; }
 
-        private MapMainController map;
+        private MapController map;
         private MapCanvas mapCanvas;
 
         public void Load(MapCanvas mapCanvas , RegionData region) {
             this.transform.localPosition = region.position;
-            this.regionData = region;
-            this.text.text = regionData.name;
+            this.data = region;
+            this.text.text = data.name;
             this.mapCanvas = mapCanvas;
             this.map = mapCanvas.mapMainController;
             SetupColor();
@@ -54,12 +54,12 @@ namespace Wtg.MapEditor {
             if (_potentialClick) {
                 if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
                     if (_selected) {
-                        map.RemoveFromSelection(regionData);
+                        map.RemoveFromSelection(data);
                     } else {
-                        map.AddToSelection(regionData);
+                        map.AddToSelection(data);
                     }
                 } else {
-                    map.SelectSingle(regionData);
+                    map.SelectSingle(data);
                 }
                 _potentialClick = false;
             }
@@ -74,8 +74,8 @@ namespace Wtg.MapEditor {
         }
 
         public void OnDrag(PointerEventData eventData) {
-            regionData.position = transform.parent.InverseTransformPoint(eventData.position);
-            map.NotifyRegionUpdated(regionData);
+            data.position = transform.parent.InverseTransformPoint(eventData.position);
+            map.NotifyRegionUpdated(data);
         }
 
         public void OnEndDrag(PointerEventData eventData) {

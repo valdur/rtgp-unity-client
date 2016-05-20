@@ -6,7 +6,7 @@ using System.Linq;
 using System;
 
 namespace Wtg.MapEditor {
-    public class MapMainController : MonoBehaviour {
+    public class MapController : MonoBehaviour {
 
         private Dictionary<string,RegionData> regions = new Dictionary<string, RegionData>();
         private Dictionary<string, ConnectionData> connections = new Dictionary<string, ConnectionData>();
@@ -108,10 +108,10 @@ namespace Wtg.MapEditor {
         internal void DeleteSelectedObjects() {
             var regs = selectedRegions.Select(x => GetRegion(x));
 
-            var cons = selectedConnections.Select(c => GetConnection(c));
+            var cons = new HashSet<ConnectionData>(selectedConnections.Select(c => GetConnection(c)));
             foreach(var con in connections) {
                 if (selectedRegions.Contains(con.Value.firstRegionId) || selectedRegions.Contains(con.Value.secondRegionId)) {
-
+                    cons.Add(con.Value);
                 }
             }
 

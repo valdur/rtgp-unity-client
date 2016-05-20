@@ -4,8 +4,8 @@ using System.Collections;
 public class BookmarksBarWidget : MonoBehaviour {
 
     public BookmarkWidget bookmarkPrefab;
-    public Transform[] prefabs;
     public Transform bookmarkParent;
+    public Transform[] prefabs;
 
 
     // Use this for initialization

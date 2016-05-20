@@ -15,16 +15,21 @@ namespace Wtg.MapEditor {
         public Color selectedRegionColor;
         public Color deselectedRegionColor;
 
+        public Color selectedConnectionColor;
+        public Color deselectedConnectionColor;
+
         private List<RegionPlate> regions = new List<RegionPlate>();
         private List<ConnectionPlate> connections = new List<ConnectionPlate>();
 
-        public MapMainController mapMainController;
+        public MapController mapMainController;
 
         private void OnEnable() {
             mapMainController.SelectionChangedEvent += SelectionChangedHandler;
-            mapMainController.RegionCreatedEvent += CreateRegion;
-            mapMainController.ConnectionCreatedEvent += CreateConnection;
 
+            mapMainController.ConnectionCreatedEvent += CreateConnection;
+            mapMainController.ConnectionDestroyedEvent += DestroyConnection;
+
+            mapMainController.RegionCreatedEvent += CreateRegion;
             mapMainController.RegionUpdatedEvent += ReloadRegion;
             mapMainController.RegionDestroyedEvent += DestroyRegion;
         }
@@ -35,7 +40,10 @@ namespace Wtg.MapEditor {
 
         public void SelectionChangedHandler() {
             foreach (var reg in regions) {
-                reg.selected = mapMainController.IsRegionSelected(reg.regionData._id);
+                reg.selected = mapMainController.IsRegionSelected(reg.data._id);
+            }
+            foreach (var con in connections) {
+                con.selected = mapMainController.IsConnectionSelected(con.data._id);
             }
         }
 
@@ -61,12 +69,12 @@ namespace Wtg.MapEditor {
         }
 
         private void ReloadRegion(RegionData regionData) {
-            var reg = regions.Find(x => x.regionData == regionData);
+            var reg = regions.Find(x => x.data == regionData);
             reg.Load(this, regionData);
         }
 
         private void DestroyRegion(RegionData region) {
-            var reg = regions.Find(x => x.regionData._id == region._id);
+            var reg = regions.Find(x => x.data._id == region._id);
             regions.Remove(reg);
             Destroy(reg.gameObject);
         }
@@ -86,7 +94,7 @@ namespace Wtg.MapEditor {
         }
 
         public void SelectSingle(RegionPlate regionToSelect) {
-            mapMainController.SelectSingle(regionToSelect.regionData);
+            mapMainController.SelectSingle(regionToSelect.data);
         }
 
         public void DeselectAll() {
