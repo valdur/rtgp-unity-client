@@ -18,13 +18,25 @@ namespace Wtg.MapEditor {
             this.connectButton.onClick.AddListener(ConnectClickHandler);
         }
 
+        void Update() {
+            if (Input.GetKeyDown(KeyCode.Space)) {
+                ConnectClickHandler();
+            }
+        }
+
         void ConnectClickHandler() {
             map.CreateConnection(firstRegion, secondRegion);
+            SetupButtonVisibility();
         }
 
         protected override void Load() {
             firstRegion = map.GetRegion(map.selectedRegions[0]);
             secondRegion = map.GetRegion(map.selectedRegions[1]);
+            SetupButtonVisibility();
+        }
+
+        private void SetupButtonVisibility() {
+            connectButton.gameObject.SetActive(!map.AreRegionsConnected(firstRegion._id, secondRegion._id));
         }
 
         protected override bool ShouldShow() {

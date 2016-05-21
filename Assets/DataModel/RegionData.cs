@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 namespace Wtg.DataModel {
     public class RegionData : MongoDocument {
 
-        public static string[] allowedAreaTypes = new string[] {
+        public static string[] areaTypeValues = new string[] {
             "normal",
             "rough",
             "water"
@@ -16,8 +16,6 @@ namespace Wtg.DataModel {
         public string name;
         public string description;
         public string areaType;
-        public string owner; // id
-        public string ownerName;
         public float x;
         public float y;
 

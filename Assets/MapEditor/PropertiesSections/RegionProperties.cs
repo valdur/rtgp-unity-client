@@ -3,20 +3,35 @@ using System.Collections;
 using System;
 using UnityEngine.UI;
 using Wtg.DataModel;
+using System.Linq;
 
 namespace Wtg.MapEditor {
     public class RegionProperties : AbstractProperties {
 
-        public InputField nameText;
-
-        public InputField descText;
+        [SerializeField]
+        private InputField nameText;
+        [SerializeField]
+        private InputField descText;
+        [SerializeField]
+        private Dropdown typeDropdown;
 
         private RegionData region;
 
         protected override void Awake() {
             base.Awake();
-            nameText.onEndEdit.AddListener(EndEditNameHandler);
-            descText.onEndEdit.AddListener(EndEditDescHandler);
+            nameText.onEndEdit.AddListener(NameEditedHandler);
+            descText.onEndEdit.AddListener(DescEditedHandler);
+            typeDropdown.AddOptions(RegionData.areaTypeValues.Select(x => new Dropdown.OptionData(x)).ToList());
+            typeDropdown.onValueChanged.AddListener(TypeEditedHandler);
+        }
+
+        private void Update() {
+            if (Input.GetKeyDown(KeyCode.F2)) {
+                nameText.ActivateInputField();
+            }
+            if (Input.GetKeyDown(KeyCode.F3)) {
+                descText.ActivateInputField();
+            }
         }
 
         protected override bool ShouldShow() {
@@ -27,15 +42,21 @@ namespace Wtg.MapEditor {
             region = map.GetRegion(map.selectedRegions[0]);
             nameText.text = region.name;
             descText.text = region.description;
+            typeDropdown.value = System.Array.IndexOf(RegionData.areaTypeValues, region.areaType);
         }
 
-        private void EndEditDescHandler(string arg0) {
+        private void DescEditedHandler(string arg0) {
             region.description = arg0;
             map.NotifyRegionUpdated(region);
         }
 
-        private void EndEditNameHandler(string arg0) {
+        private void NameEditedHandler(string arg0) {
             region.name = arg0;
+            map.NotifyRegionUpdated(region);
+        }
+
+        private void TypeEditedHandler(int typeIndex) {
+            region.areaType = RegionData.areaTypeValues[typeIndex];
             map.NotifyRegionUpdated(region);
         }
     }

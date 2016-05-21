@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using UnityEngine.UI;
 using Wtg.DataModel;
+using System.Linq;
 
 namespace Wtg.MapEditor {
 
@@ -12,10 +13,31 @@ namespace Wtg.MapEditor {
         private Text firstRegionName;
         [SerializeField]
         private Text secondRegionName;
+        [SerializeField]
+        Dropdown transportDropdown;
+        [SerializeField]
+        InputField distanceInputField;
 
         ConnectionData connection;
         RegionData firstRegion;
         RegionData secondRegion;
+
+        protected override void Awake() {
+            base.Awake();
+            transportDropdown.AddOptions(ConnectionData.transportValues.Select(x => new Dropdown.OptionData(x)).ToList());
+            transportDropdown.onValueChanged.AddListener(TransportEditedHandler);
+            distanceInputField.onEndEdit.AddListener(DistanceEditedHandler);
+        }
+
+        private void DistanceEditedHandler(string value) {
+            connection.distance = int.Parse(value);
+            map.NotifyConnectionUpdated(connection);
+        }
+
+        private void TransportEditedHandler(int value) {
+            connection.transport = ConnectionData.transportValues[value];
+            map.NotifyConnectionUpdated(connection);
+        }
 
         protected override bool ShouldShow() {
             return map.selectedConnections.Count == 1 && map.selectedRegions.Count == 0;
@@ -27,6 +49,9 @@ namespace Wtg.MapEditor {
             secondRegion = map.GetRegion(connection.secondRegionId);
             firstRegionName.text = firstRegion.name;
             secondRegionName.text = secondRegion.name;
+            transportDropdown.value = System.Array.IndexOf(ConnectionData.transportValues, connection.transport);
+            distanceInputField.text = connection.distance.ToString();
+
         }
     }
 }

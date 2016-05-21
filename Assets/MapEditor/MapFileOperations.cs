@@ -32,9 +32,15 @@ public class MapFileOperations : MonoBehaviour {
     const string mapSearchPattern = "*.rtgmap";
 
     private void Awake() {
+        EnsureDirectoryExistance();
         loadButton.onClick.AddListener(LoadHandler);
         saveButton.onClick.AddListener(SaveHandler);
         selectBackgroundButton.onClick.AddListener(SelectBackgroundHandler);
+    }
+
+    private void EnsureDirectoryExistance() {
+        if (!Directory.Exists(dirName))
+            Directory.CreateDirectory(dirName);
     }
 
     private void LoadHandler() {
@@ -44,7 +50,7 @@ public class MapFileOperations : MonoBehaviour {
     private void LoadMap(string filename) {
         MapData md = JsonConvert.DeserializeObject<MapData>(File.ReadAllText(GetPath(filename)));
         LoadBackground(md.bgFilename);
-        mapController.Load(md.regions, md.connections);
+        mapController.Load(md.gameAreas, md.areaConnections);
     }
 
     private void SaveHandler() {
@@ -57,8 +63,8 @@ public class MapFileOperations : MonoBehaviour {
         }
         MapData md = new MapData {
             bgFilename = bgFilename,
-            regions = mapController.GetRegions().ToArray(),
-            connections = mapController.GetConnections().ToArray()
+            gameAreas = mapController.GetRegions().ToArray(),
+            areaConnections = mapController.GetConnections().ToArray()
         };
         File.WriteAllText(GetPath(filename), JsonConvert.SerializeObject(md));
     }
@@ -83,7 +89,7 @@ public class MapFileOperations : MonoBehaviour {
 
     public class MapData {
         public string bgFilename;
-        public RegionData[] regions;
-        public ConnectionData[] connections;
+        public RegionData[] gameAreas;
+        public ConnectionData[] areaConnections;
     }
 }

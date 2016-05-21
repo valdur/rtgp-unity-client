@@ -94,11 +94,16 @@ namespace Wtg.MapEditor {
             RegionUpdatedEvent(region);
         }
 
+        public void NotifyConnectionUpdated(ConnectionData connection) {
+            ConnectionUpdatedEvent(connection);
+        }
+
         public void CreateRegion(Vector3 position) {
             var regionData = new RegionData() {
-                _id = System.Guid.NewGuid().ToString(),
+                _id = System.Guid.NewGuid().ToString().Replace("-",""),
                 name = "Le Region",
                 description = "Le Description",
+                areaType = RegionData.areaTypeValues[0],
                 position = position
             };
             regions[regionData._id] = regionData;
@@ -121,11 +126,19 @@ namespace Wtg.MapEditor {
             return selectedConnections.Contains(id);
         }
 
+        public bool AreRegionsConnected(string id1, string id2) {
+            return connections.Values.Any(x => (x.firstRegionId == id1 && x.secondRegionId == id2) || (x.firstRegionId == id2 && x.secondRegionId == id1));
+        }
+
         public void CreateConnection(RegionData fromRegion, RegionData toRegion) {
+            if (AreRegionsConnected(fromRegion._id, toRegion._id))
+                return;
             var connection = new ConnectionData() {
-                _id = System.Guid.NewGuid().ToString(),
+                _id = System.Guid.NewGuid().ToString().Replace("-", ""),
                 firstRegionId = fromRegion._id,
-                secondRegionId = toRegion._id
+                secondRegionId = toRegion._id,
+                transport = ConnectionData.transportValues[0],
+                distance = 1,
             };
             connections[connection._id] = connection;
             ConnectionCreatedEvent(connection);
