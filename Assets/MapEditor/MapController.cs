@@ -28,6 +28,32 @@ namespace Wtg.MapEditor {
             SelectionChangedEvent();
         }
 
+        internal void Load(IEnumerable<RegionData> regions, IEnumerable<ConnectionData> connections) {
+            DeleteAll();
+            foreach( var reg in regions) {
+                this.regions[reg._id] = reg;
+                RegionCreatedEvent(reg);
+            }
+            foreach (var con in connections) {
+                this.connections[con._id] = con;
+                ConnectionCreatedEvent(con);
+            }
+        }
+
+        internal IEnumerable<RegionData> GetRegions() {
+            return regions.Values;
+        }
+
+        internal IEnumerable<ConnectionData> GetConnections() {
+            return connections.Values;
+        }
+
+        public void RefreshRegions() {
+            foreach (var reg in regions.Values) {
+
+            }
+        }
+
         internal void SelectSingle(ConnectionData connection) {
             QuietClearSelection();
             selectedConnections.Add(connection._id);
@@ -103,6 +129,29 @@ namespace Wtg.MapEditor {
             };
             connections[connection._id] = connection;
             ConnectionCreatedEvent(connection);
+        }
+
+        void SelectAll() {
+            selectedRegions = regions.Values.Select(x => x._id).ToList();
+            selectedConnections = connections.Values.Select(x => x._id).ToList();
+            SelectionChangedEvent();
+        }
+
+        void DeleteAll() {
+
+            foreach (var con in connections.Values.ToArray()) {
+                ConnectionDestroyedEvent(con);
+            }
+
+            foreach (var reg in regions.Values.ToArray()) {
+                RegionDestroyedEvent(reg);
+            }
+
+            regions.Clear();
+            connections.Clear();
+            selectedRegions.Clear();
+            selectedConnections.Clear();
+            SelectionChangedEvent();
         }
 
         internal void DeleteSelectedObjects() {

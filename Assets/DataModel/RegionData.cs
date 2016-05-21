@@ -2,6 +2,7 @@
 using System.Collections;
 using Meteor;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace Wtg.DataModel {
     public class RegionData : MongoDocument {
@@ -17,6 +18,18 @@ namespace Wtg.DataModel {
         public string areaType;
         public string owner; // id
         public string ownerName;
-        internal Vector3 position;
+        public float x;
+        public float y;
+
+        [JsonIgnore]
+        public Vector3 position {
+            get {
+                return new Vector3(x, y);
+            }
+            set {
+                x = value.x;
+                y = value.y;
+            }
+        }
     }
 }

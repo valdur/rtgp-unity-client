@@ -37,19 +37,26 @@ public class FilePicker : MonoBehaviour {
         callback(filenameInput.text);
     }
 
-    public void Show(string title, string okCaption, string directory, string filename, System.Action<string> callback) {
+    public void Show(string title, string okCaption, string directory, string filename, System.Action<string> callback, string searchPattern) {
         Initialize();
         titleLabel.text = title;
         okButtonLabel.text = okCaption;
         gameObject.SetActive(true);
         filenameInput.text = filename;
+        this.callback = callback;
+
         var dir = new DirectoryInfo(directory);
-        foreach (var file in dir.GetFiles()) {
+        foreach (var sp in searchPattern.Split(' ')) {
+            LoadForSearchPattern(sp, dir);
+        }
+    }
+
+    private void LoadForSearchPattern(string searchPattern, DirectoryInfo dir) {
+        foreach (var file in dir.GetFiles(searchPattern)) {
             var ins = Instantiate(filePlatePrefab) as FilePlate;
             ins.transform.SetParent(filePlateRoot);
             ins.Load(file.Name, FileClickedHandler);
         }
-        this.callback = callback;
     }
 
     private void FileClickedHandler(string fileName) {

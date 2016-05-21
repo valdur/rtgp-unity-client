@@ -19,7 +19,7 @@ public class FilePickerTest : MonoBehaviour {
     }
 
     private void ButtonClickHandler() {
-        filePicker.Show("Save Wololo", "Save", dirName, "world.json", FilenameChosenHandler);
+        filePicker.Show("Save Wololo", "Save", dirName, "world.json", FilenameChosenHandler, "");
     }
 
     private void FilenameChosenHandler(string filename) {
