@@ -18,13 +18,13 @@ namespace Wtg.MapEditor {
         [SerializeField]
         InputField distanceInputField;
 
-        ConnectionData connection;
-        RegionData firstRegion;
-        RegionData secondRegion;
+        AreaConnectionData connection;
+        GameAreaData firstRegion;
+        GameAreaData secondRegion;
 
         protected override void Awake() {
             base.Awake();
-            transportDropdown.AddOptions(ConnectionData.transportValues.Select(x => new Dropdown.OptionData(x)).ToList());
+            transportDropdown.AddOptions(AreaConnectionData.transportValues.Select(x => new Dropdown.OptionData(x)).ToList());
             transportDropdown.onValueChanged.AddListener(TransportEditedHandler);
             distanceInputField.onEndEdit.AddListener(DistanceEditedHandler);
         }
@@ -35,7 +35,7 @@ namespace Wtg.MapEditor {
         }
 
         private void TransportEditedHandler(int value) {
-            connection.transport = ConnectionData.transportValues[value];
+            connection.transport = AreaConnectionData.transportValues[value];
             map.NotifyConnectionUpdated(connection);
         }
 
@@ -49,9 +49,10 @@ namespace Wtg.MapEditor {
             secondRegion = map.GetRegion(connection.secondRegionId);
             firstRegionName.text = firstRegion.name;
             secondRegionName.text = secondRegion.name;
-            transportDropdown.value = System.Array.IndexOf(ConnectionData.transportValues, connection.transport);
+            transportDropdown.value = System.Array.IndexOf(AreaConnectionData.transportValues, connection.transport);
+            transportDropdown.interactable = map.IsEditMode();
             distanceInputField.text = connection.distance.ToString();
-
+            distanceInputField.interactable = map.IsEditMode();
         }
     }
 }

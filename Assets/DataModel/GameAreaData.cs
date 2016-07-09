@@ -2,10 +2,11 @@
 using System.Collections;
 using Meteor;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace Wtg.DataModel {
-    public class RegionData : MongoDocument {
+
+    [System.Serializable]
+    public class GameAreaData : MongoDocument {
 
         public static string[] areaTypeValues = new string[] {
             "normal",
@@ -19,7 +20,6 @@ namespace Wtg.DataModel {
         public float x;
         public float y;
 
-        [JsonIgnore]
         public Vector3 position {
             get {
                 return new Vector3(x, y);

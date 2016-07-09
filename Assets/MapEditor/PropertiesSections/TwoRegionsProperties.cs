@@ -10,8 +10,8 @@ namespace Wtg.MapEditor {
         [SerializeField]
         private Button connectButton;
 
-        private RegionData firstRegion;
-        private RegionData secondRegion;
+        private GameAreaData firstRegion;
+        private GameAreaData secondRegion;
 
         protected override void Awake() {
             base.Awake();
@@ -40,6 +40,8 @@ namespace Wtg.MapEditor {
         }
 
         protected override bool ShouldShow() {
+            if (map.IsViewMode())
+                return false;
             return map.selectedRegions.Count == 2 && map.selectedConnections.Count == 0;
         }
     }

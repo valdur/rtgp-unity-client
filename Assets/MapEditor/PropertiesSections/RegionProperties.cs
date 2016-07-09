@@ -15,13 +15,13 @@ namespace Wtg.MapEditor {
         [SerializeField]
         private Dropdown typeDropdown;
 
-        private RegionData region;
+        private GameAreaData region;
 
         protected override void Awake() {
             base.Awake();
             nameText.onEndEdit.AddListener(NameEditedHandler);
             descText.onEndEdit.AddListener(DescEditedHandler);
-            typeDropdown.AddOptions(RegionData.areaTypeValues.Select(x => new Dropdown.OptionData(x)).ToList());
+            typeDropdown.AddOptions(GameAreaData.areaTypeValues.Select(x => new Dropdown.OptionData(x)).ToList());
             typeDropdown.onValueChanged.AddListener(TypeEditedHandler);
         }
 
@@ -41,8 +41,11 @@ namespace Wtg.MapEditor {
         protected override void Load() {
             region = map.GetRegion(map.selectedRegions[0]);
             nameText.text = region.name;
+            nameText.interactable = map.IsEditMode();
             descText.text = region.description;
-            typeDropdown.value = System.Array.IndexOf(RegionData.areaTypeValues, region.areaType);
+            descText.interactable = map.IsEditMode();
+            typeDropdown.value = System.Array.IndexOf(GameAreaData.areaTypeValues, region.areaType);
+            typeDropdown.interactable = map.IsEditMode();
         }
 
         private void DescEditedHandler(string arg0) {
@@ -56,7 +59,7 @@ namespace Wtg.MapEditor {
         }
 
         private void TypeEditedHandler(int typeIndex) {
-            region.areaType = RegionData.areaTypeValues[typeIndex];
+            region.areaType = GameAreaData.areaTypeValues[typeIndex];
             map.NotifyRegionUpdated(region);
         }
     }

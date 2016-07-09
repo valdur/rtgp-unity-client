@@ -4,8 +4,9 @@ using System;
 
 namespace Wtg.MapEditor {
     public class MultipleSelectionProperties : AbstractProperties {
+
         protected override void Load() {
-            
+
         }
 
         protected override bool ShouldShow() {

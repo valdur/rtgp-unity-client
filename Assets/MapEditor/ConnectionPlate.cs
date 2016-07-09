@@ -14,7 +14,7 @@ namespace Wtg.MapEditor {
 
         MapCanvas canvas;
         MapController map;
-        public ConnectionData data { get; private set; }
+        public AreaConnectionData data { get; private set; }
         RectTransform rectTransform;
         private bool _selected;
 
@@ -29,17 +29,30 @@ namespace Wtg.MapEditor {
         }
 
         void SetupColor() {
-            bg.color = _selected ? canvas.selectedConnectionColor : canvas.deselectedConnectionColor;
+
+            if (_selected) {
+                bg.color = canvas.selectedConnectionColor;
+            } else {
+                int index = System.Array.IndexOf(AreaConnectionData.transportValues, data.transport);
+                bg.color = canvas.deselectedConnectionColors[index];
+            }
         }
 
-        internal void Load(MapCanvas mapCanvas, ConnectionData connection) {
+        internal void Load(MapCanvas mapCanvas, AreaConnectionData connection) {
             this.canvas = mapCanvas;
             this.data = connection;
-            this.map = canvas.mapMainController;
+            this.map = canvas.mapController;
             this.rectTransform = transform as RectTransform;
 
             map.RegionUpdatedEvent += RegionUpdatedHandler;
+            map.ConnectionUpdatedEvent += ConnectionUpdatedHandler;
             RecalculatePosition();
+            SetupColor();
+        }
+
+        private void ConnectionUpdatedHandler(AreaConnectionData conn) {
+            if (conn._id == data._id)
+                SetupColor();
         }
 
         void OnDestroy() {
@@ -52,14 +65,14 @@ namespace Wtg.MapEditor {
 
             rectTransform.localPosition = p1;
 
-            var w = rectTransform.sizeDelta.x;
+            var w = map.IsEditMode() ? canvas.editConnectionThickness : canvas.viewConnectionThickness;
             var h = Vector3.Distance(p1, p2);
             rectTransform.sizeDelta = new Vector2(w, h);
             rectTransform.rotation = Quaternion.FromToRotation(Vector3.up, p2 - p1);
 
         }
 
-        private void RegionUpdatedHandler(RegionData region) {
+        private void RegionUpdatedHandler(GameAreaData region) {
             if (data.firstRegionId == region._id || data.secondRegionId == region._id) {
                 RecalculatePosition();
             }

@@ -8,27 +8,38 @@ using System;
 namespace Wtg.MapEditor {
     public class MapController : MonoBehaviour {
 
-        private Dictionary<string,RegionData> regions = new Dictionary<string, RegionData>();
-        private Dictionary<string, ConnectionData> connections = new Dictionary<string, ConnectionData>();
+        private Dictionary<string,GameAreaData> regions = new Dictionary<string, GameAreaData>();
+        private Dictionary<string, AreaConnectionData> connections = new Dictionary<string, AreaConnectionData>();
         public List<string> selectedRegions = new List<string>();
         public List<string> selectedConnections = new List<string>();
+        public enum Mode { Edit, View};
 
-        public event System.Action<RegionData> RegionCreatedEvent = delegate { };
-        public event System.Action<RegionData> RegionDestroyedEvent = delegate { };
-        public event System.Action<RegionData> RegionUpdatedEvent = delegate { };
-        public event System.Action<ConnectionData> ConnectionCreatedEvent = delegate { };
-        public event System.Action<ConnectionData> ConnectionDestroyedEvent = delegate { };
-        public event System.Action<ConnectionData> ConnectionUpdatedEvent = delegate { };
+        public event System.Action<GameAreaData> RegionCreatedEvent = delegate { };
+        public event System.Action<GameAreaData> RegionDestroyedEvent = delegate { };
+        public event System.Action<GameAreaData> RegionUpdatedEvent = delegate { };
+        public event System.Action<AreaConnectionData> ConnectionCreatedEvent = delegate { };
+        public event System.Action<AreaConnectionData> ConnectionDestroyedEvent = delegate { };
+        public event System.Action<AreaConnectionData> ConnectionUpdatedEvent = delegate { };
 
         public event System.Action SelectionChangedEvent = delegate { };
 
-        public void SelectSingle(RegionData region) {
+        public Mode mode { get; private set; }
+
+        public void SelectSingle(GameAreaData region) {
             QuietClearSelection();
             selectedRegions.Add(region._id);
             SelectionChangedEvent();
         }
 
-        internal void Load(IEnumerable<RegionData> regions, IEnumerable<ConnectionData> connections) {
+        internal bool IsEditMode() {
+            return mode == Mode.Edit;
+        }
+
+        internal bool IsViewMode() {
+            return mode == Mode.View;
+        }
+
+        internal void Load(IEnumerable<GameAreaData> regions, IEnumerable<AreaConnectionData> connections) {
             DeleteAll();
             foreach( var reg in regions) {
                 this.regions[reg._id] = reg;
@@ -40,42 +51,56 @@ namespace Wtg.MapEditor {
             }
         }
 
-        internal IEnumerable<RegionData> GetRegions() {
+        internal void EnterEditMode() {
+            mode = Mode.Edit;
+            RefreshAll();
+        }
+
+        internal void EnterViewMode() {
+            mode = Mode.View;
+            RefreshAll();
+        }
+
+        internal IEnumerable<GameAreaData> GetRegions() {
             return regions.Values;
         }
 
-        internal IEnumerable<ConnectionData> GetConnections() {
+        internal IEnumerable<AreaConnectionData> GetConnections() {
             return connections.Values;
         }
 
-        public void RefreshRegions() {
+        public void RefreshAll() {
             foreach (var reg in regions.Values) {
-
+                RegionUpdatedEvent(reg);
             }
+            foreach (var con in connections.Values) {
+                ConnectionUpdatedEvent(con);
+            }
+            SelectionChangedEvent();
         }
 
-        internal void SelectSingle(ConnectionData connection) {
+        internal void SelectSingle(AreaConnectionData connection) {
             QuietClearSelection();
             selectedConnections.Add(connection._id);
             SelectionChangedEvent();
         }
 
-        public void AddToSelection(RegionData region) {
+        public void AddToSelection(GameAreaData region) {
             selectedRegions.Add(region._id);
             SelectionChangedEvent();
         }
 
-        public void AddToSelection(ConnectionData region) {
+        public void AddToSelection(AreaConnectionData region) {
             selectedConnections.Add(region._id);
             SelectionChangedEvent();
         }
 
-        public void RemoveFromSelection(RegionData connection) {
+        public void RemoveFromSelection(GameAreaData connection) {
             selectedRegions.Remove(connection._id);
             SelectionChangedEvent();
         }
 
-        public void RemoveFromSelection(ConnectionData connection) {
+        public void RemoveFromSelection(AreaConnectionData connection) {
             selectedConnections.Remove(connection._id);
             SelectionChangedEvent();
         }
@@ -90,31 +115,31 @@ namespace Wtg.MapEditor {
             selectedConnections.Clear();
         }
 
-        public void NotifyRegionUpdated(RegionData region) {
+        public void NotifyRegionUpdated(GameAreaData region) {
             RegionUpdatedEvent(region);
         }
 
-        public void NotifyConnectionUpdated(ConnectionData connection) {
+        public void NotifyConnectionUpdated(AreaConnectionData connection) {
             ConnectionUpdatedEvent(connection);
         }
 
         public void CreateRegion(Vector3 position) {
-            var regionData = new RegionData() {
+            var regionData = new GameAreaData() {
                 _id = System.Guid.NewGuid().ToString().Replace("-",""),
                 name = "Le Region",
                 description = "Le Description",
-                areaType = RegionData.areaTypeValues[0],
+                areaType = GameAreaData.areaTypeValues[0],
                 position = position
             };
             regions[regionData._id] = regionData;
             RegionCreatedEvent(regionData);
         }
 
-        public RegionData GetRegion(string id) {
+        public GameAreaData GetRegion(string id) {
             return regions[id];
         }
 
-        public ConnectionData GetConnection(string id) {
+        public AreaConnectionData GetConnection(string id) {
             return connections[id];
         }
 
@@ -130,14 +155,14 @@ namespace Wtg.MapEditor {
             return connections.Values.Any(x => (x.firstRegionId == id1 && x.secondRegionId == id2) || (x.firstRegionId == id2 && x.secondRegionId == id1));
         }
 
-        public void CreateConnection(RegionData fromRegion, RegionData toRegion) {
+        public void CreateConnection(GameAreaData fromRegion, GameAreaData toRegion) {
             if (AreRegionsConnected(fromRegion._id, toRegion._id))
                 return;
-            var connection = new ConnectionData() {
+            var connection = new AreaConnectionData() {
                 _id = System.Guid.NewGuid().ToString().Replace("-", ""),
                 firstRegionId = fromRegion._id,
                 secondRegionId = toRegion._id,
-                transport = ConnectionData.transportValues[0],
+                transport = AreaConnectionData.transportValues[0],
                 distance = 1,
             };
             connections[connection._id] = connection;
@@ -170,7 +195,7 @@ namespace Wtg.MapEditor {
         internal void DeleteSelectedObjects() {
             var regs = selectedRegions.Select(x => GetRegion(x));
 
-            var cons = new HashSet<ConnectionData>(selectedConnections.Select(c => GetConnection(c)));
+            var cons = new HashSet<AreaConnectionData>(selectedConnections.Select(c => GetConnection(c)));
             foreach(var con in connections) {
                 if (selectedRegions.Contains(con.Value.firstRegionId) || selectedRegions.Contains(con.Value.secondRegionId)) {
                     cons.Add(con.Value);

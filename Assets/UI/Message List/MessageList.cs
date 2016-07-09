@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using Wtg.DataModel;
 

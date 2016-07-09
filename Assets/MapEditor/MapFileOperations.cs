@@ -5,7 +5,6 @@ using System;
 using System.IO;
 using Wtg.MapEditor;
 using Wtg.DataModel;
-using Newtonsoft.Json;
 using System.Linq;
 
 public class MapFileOperations : MonoBehaviour {
@@ -18,6 +17,11 @@ public class MapFileOperations : MonoBehaviour {
     private Button saveButton;
     [SerializeField]
     private Button selectBackgroundButton;
+    [SerializeField]
+    private Button editModeButton;
+    [SerializeField]
+    private Button viewModeButton;
+
     [SerializeField]
     private MapController mapController;
 
@@ -35,7 +39,15 @@ public class MapFileOperations : MonoBehaviour {
         EnsureDirectoryExistance();
         loadButton.onClick.AddListener(LoadHandler);
         saveButton.onClick.AddListener(SaveHandler);
+        editModeButton.onClick.AddListener(EditModeHandler);
+        viewModeButton.onClick.AddListener(ViewModeHandler);
         selectBackgroundButton.onClick.AddListener(SelectBackgroundHandler);
+        SetupModeButtons();
+    }
+
+    void SetupModeButtons() {
+        viewModeButton.interactable = mapController.mode != MapController.Mode.View;
+        editModeButton.interactable = mapController.mode != MapController.Mode.Edit;
     }
 
     private void EnsureDirectoryExistance() {
@@ -48,9 +60,19 @@ public class MapFileOperations : MonoBehaviour {
     }
 
     private void LoadMap(string filename) {
-        MapData md = JsonConvert.DeserializeObject<MapData>(File.ReadAllText(GetPath(filename)));
+        MapData md = JsonUtility.FromJson<MapData>(File.ReadAllText(GetPath(filename)));
         LoadBackground(md.bgFilename);
         mapController.Load(md.gameAreas, md.areaConnections);
+    }
+
+    private void ViewModeHandler() {
+        mapController.EnterViewMode();
+        SetupModeButtons();
+    }
+
+    private void EditModeHandler() {
+        mapController.EnterEditMode();
+        SetupModeButtons();
     }
 
     private void SaveHandler() {
@@ -63,10 +85,10 @@ public class MapFileOperations : MonoBehaviour {
         }
         MapData md = new MapData {
             bgFilename = bgFilename,
-            gameAreas = mapController.GetRegions().ToArray(),
-            areaConnections = mapController.GetConnections().ToArray()
+            gameAreas = mapController.GetRegions().ToList(),
+            areaConnections = mapController.GetConnections().ToList()
         };
-        File.WriteAllText(GetPath(filename), JsonConvert.SerializeObject(md));
+        File.WriteAllText(GetPath(filename), JsonUtility.ToJson(md));
     }
 
     private string GetPath(string filename) {
@@ -85,11 +107,6 @@ public class MapFileOperations : MonoBehaviour {
         tex.LoadImage(bytes);
         background.texture = tex;
         background.rectTransform.sizeDelta = new Vector2(tex.width, tex.height);
-    }
-
-    public class MapData {
-        public string bgFilename;
-        public RegionData[] gameAreas;
-        public ConnectionData[] areaConnections;
+        mapController.RefreshAll();
     }
 }

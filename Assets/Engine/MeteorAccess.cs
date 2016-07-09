@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using Wtg.DataModel;
 using Meteor.Extensions;
 using System;
@@ -16,9 +15,16 @@ public class MeteorAccess : MonoBehaviour {
     }
 
     private Meteor.Collection<MessageData> messagesCollection;
-    private Meteor.Collection<UserData> usersCollection;
     private Meteor.Cursor<MessageData> messagesCursor;
+
+    private Meteor.Collection<UserData> usersCollection;
     private Meteor.Cursor<UserData> usersCursor;
+
+    private Meteor.Collection<GameAreaData> gameAreasCollection;
+    private Meteor.Cursor<GameAreaData> gameAreasCursor;
+
+    private Meteor.Collection<AreaConnectionData> areaConnectionsCollection;
+    private Meteor.Cursor<AreaConnectionData> areaConnectionsCursor;
 
     IEnumerator ConnectCor(System.Action successCallback, System.Action failCallback) {
         yield return Meteor.Connection.Connect(serverAddress);
@@ -51,6 +57,15 @@ public class MeteorAccess : MonoBehaviour {
             (removedId) => MessageRemovedEvent(removedId));
     }
 
+    private void SetupGameAreasAccess() {
+        gameAreasCollection = new Meteor.Collection<GameAreaData>("game-areas");
+        gameAreasCursor = gameAreasCollection.Find();
+        gameAreasCursor.Observe(
+            (addedId, addedObject) => GameAreaAddedEvent(addedObject),
+            (changedId, changedObject, fuzzyDict, fuzzyStringList) => GameAreaChangedEvent(changedObject),
+            (removedId) => GameAreaRemovedEvent(removedId));
+    }
+
     IEnumerator LoginCor(string email, string password, System.Action successCallback, System.Action failCallback) {
         yield return (Coroutine)Meteor.Accounts.LoginWith(email, password);
 
@@ -78,8 +93,6 @@ public class MeteorAccess : MonoBehaviour {
     public void SetUser(UserData ud) {
 
     }
-
-
     public System.Action<UserData> UserAddedEvent = delegate { };
     public System.Action<UserData> UserChangedEvent = delegate { };
     public System.Action<string> UserRemovedEvent = delegate { };
@@ -91,5 +104,13 @@ public class MeteorAccess : MonoBehaviour {
     public System.Action<MessageData> MessageAddedEvent = delegate { };
     public System.Action<MessageData> MessageChangedEvent = delegate { };
     public System.Action<string> MessageRemovedEvent = delegate { };
+
+
+    public IEnumerable<GameAreaData> GetGameAreas() {
+        return gameAreasCursor.Fetch();
+    }
+    public System.Action<GameAreaData> GameAreaAddedEvent = delegate { };
+    public System.Action<GameAreaData> GameAreaChangedEvent = delegate { };
+    public System.Action<string> GameAreaRemovedEvent = delegate { };
 
 }

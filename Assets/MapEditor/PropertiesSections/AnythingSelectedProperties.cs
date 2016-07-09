@@ -18,6 +18,8 @@ namespace Wtg.MapEditor {
         }
 
         protected override bool ShouldShow() {
+            if (map.IsViewMode())
+                return false;
             return map.selectedConnections.Count > 0 || map.selectedRegions.Count > 0;
         }
 

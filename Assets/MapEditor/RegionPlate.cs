@@ -7,7 +7,7 @@ using UnityEngine.Assertions;
 using Wtg.DataModel;
 
 namespace Wtg.MapEditor {
-    public class RegionPlate : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler, IEndDragHandler {
+    public class RegionPlate : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IBeginDragHandler, IDragHandler {
 
         [SerializeField]
         private Text text;
@@ -32,17 +32,17 @@ namespace Wtg.MapEditor {
             }
         }
 
-        public RegionData data { get; private set; }
+        public GameAreaData data { get; private set; }
 
         private MapController map;
-        private MapCanvas mapCanvas;
+        private MapCanvas canvas;
 
-        public void Load(MapCanvas mapCanvas , RegionData region) {
+        public void Load(MapCanvas mapCanvas, GameAreaData region) {
             this.transform.localPosition = region.position;
             this.data = region;
             this.text.text = data.name;
-            this.mapCanvas = mapCanvas;
-            this.map = mapCanvas.mapMainController;
+            this.canvas = mapCanvas;
+            this.map = mapCanvas.mapController;
             SetupColor();
         }
 
@@ -52,21 +52,30 @@ namespace Wtg.MapEditor {
 
         public void OnPointerUp(PointerEventData eventData) {
             if (_potentialClick) {
-                if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
-                    if (_selected) {
-                        map.RemoveFromSelection(data);
-                    } else {
-                        map.AddToSelection(data);
-                    }
-                } else {
-                    map.SelectSingle(data);
-                }
+                HandleClick();
                 _potentialClick = false;
             }
         }
 
+        private void HandleClick() {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) {
+                if (_selected) {
+                    map.RemoveFromSelection(data);
+                } else {
+                    map.AddToSelection(data);
+                }
+            } else {
+                map.SelectSingle(data);
+            }
+        }
+
         void SetupColor() {
-            bg.color = _selected ? mapCanvas.selectedRegionColor : mapCanvas.deselectedRegionColor;
+            if (_selected) {
+                bg.color = canvas.selectedRegionColor;
+            } else {
+                int index = System.Array.IndexOf(GameAreaData.areaTypeValues, data.areaType);
+                bg.color = canvas.deselectedRegionColors[index];
+            }
         }
 
         public void OnBeginDrag(PointerEventData eventData) {
@@ -74,11 +83,10 @@ namespace Wtg.MapEditor {
         }
 
         public void OnDrag(PointerEventData eventData) {
-            data.position = transform.parent.InverseTransformPoint(eventData.position);
-            map.NotifyRegionUpdated(data);
-        }
-
-        public void OnEndDrag(PointerEventData eventData) {
+            if (map.IsEditMode()) {
+                data.position = transform.parent.InverseTransformPoint(eventData.position);
+                map.NotifyRegionUpdated(data);
+            }
         }
     }
 }

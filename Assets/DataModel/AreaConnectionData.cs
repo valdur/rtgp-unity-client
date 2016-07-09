@@ -3,7 +3,9 @@ using System.Collections;
 using Meteor;
 
 namespace Wtg.DataModel {
-    public class ConnectionData : MongoDocument {
+
+    [System.Serializable]
+    public class AreaConnectionData : MongoDocument {
 
         public static string[] transportValues = new string[] {
             "land",
