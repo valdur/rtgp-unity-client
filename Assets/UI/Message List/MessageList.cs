@@ -9,12 +9,12 @@ public class MessageList : MonoBehaviour {
     public Transform listContent;
 
     public void Start() {
-        foreach (var msg in MeteorAccess.instance.GetMessages()) {
+        foreach (var msg in MeteorAccess.instance.messages.Get()) {
             CreateMessage(msg);
         }
-        MeteorAccess.instance.MessageAddedEvent += CreateOrUpdateMessage;
-        MeteorAccess.instance.MessageChangedEvent += CreateOrUpdateMessage;
-        MeteorAccess.instance.MessageRemovedEvent += RemoveMessage;
+        MeteorAccess.instance.messages.AddedEvent += CreateOrUpdateMessage;
+        MeteorAccess.instance.messages.ChangedEvent += CreateOrUpdateMessage;
+        MeteorAccess.instance.messages.RemovedEvent += RemoveMessage;
     }
 
     private void CreateOrUpdateMessage(MessageData msg) {

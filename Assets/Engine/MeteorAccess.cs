@@ -4,34 +4,26 @@ using System.Collections.Generic;
 using Wtg.DataModel;
 using Meteor.Extensions;
 using System;
+using Meteor;
 
 public class MeteorAccess : MonoBehaviour {
 
-    public string serverAddress = "ws://seriousdragon.com:3000/websocket";
+    public string serverAddress;
     public static MeteorAccess instance;
 
     void Awake() {
         instance = this;
     }
 
-    private Meteor.Collection<MessageData> messagesCollection;
-    private Meteor.Cursor<MessageData> messagesCursor;
-
-    private Meteor.Collection<UserData> usersCollection;
-    private Meteor.Cursor<UserData> usersCursor;
-
-    private Meteor.Collection<GameAreaData> gameAreasCollection;
-    private Meteor.Cursor<GameAreaData> gameAreasCursor;
-
-    private Meteor.Collection<AreaConnectionData> areaConnectionsCollection;
-    private Meteor.Cursor<AreaConnectionData> areaConnectionsCursor;
+    public Collection<MessageData> messages;
+    public Collection<UserData> users;
+    public Collection<GameAreaData> gameAreas;
+    public Collection<AreaConnectionData> areaConnections;
 
     IEnumerator ConnectCor(System.Action successCallback, System.Action failCallback) {
         yield return Meteor.Connection.Connect(serverAddress);
         if (Meteor.Connection.Connected) {
-
-            SetupUsersAccess();
-            SetupMessagesAccess();
+            Debug.Log("connected to server");
 
             successCallback();
         } else {
@@ -39,37 +31,16 @@ public class MeteorAccess : MonoBehaviour {
         }
     }
 
-    private void SetupUsersAccess() {
-        usersCollection = new Meteor.Collection<UserData>("users");
-        usersCursor = usersCollection.Find();
-        usersCursor.Observe(
-            (addedId, addedObject) => UserAddedEvent(addedObject),
-            (changedId, changedObject, fuzzyDict, fuzzyStringList) => UserChangedEvent(changedObject),
-            (removedId) => UserRemovedEvent(removedId));
-    }
-
-    private void SetupMessagesAccess() {
-        messagesCollection = new Meteor.Collection<MessageData>("messages");
-        messagesCursor = messagesCollection.Find(x => x.recipent == Meteor.Accounts.UserId || x.sender == Meteor.Accounts.UserId);
-        messagesCursor.Observe(
-            (addedId, addedObject) => MessageAddedEvent(addedObject),
-            (changedId, changedObject, fuzzyDict, fuzzyStringList) => MessageChangedEvent(changedObject),
-            (removedId) => MessageRemovedEvent(removedId));
-    }
-
-    private void SetupGameAreasAccess() {
-        gameAreasCollection = new Meteor.Collection<GameAreaData>("game-areas");
-        gameAreasCursor = gameAreasCollection.Find();
-        gameAreasCursor.Observe(
-            (addedId, addedObject) => GameAreaAddedEvent(addedObject),
-            (changedId, changedObject, fuzzyDict, fuzzyStringList) => GameAreaChangedEvent(changedObject),
-            (removedId) => GameAreaRemovedEvent(removedId));
-    }
-
     IEnumerator LoginCor(string email, string password, System.Action successCallback, System.Action failCallback) {
         yield return (Coroutine)Meteor.Accounts.LoginWith(email, password);
 
         if (Meteor.Accounts.IsLoggedIn) {
+
+            users = new Collection<UserData>("users");
+            messages = new Collection<MessageData>("messages", x => x.recipent == Meteor.Accounts.UserId || x.sender == Meteor.Accounts.UserId);
+            gameAreas = new Collection<GameAreaData>("game-areas");
+            areaConnections = new Collection<AreaConnectionData>("area-connections");
+
             successCallback();
         } else {
             failCallback();
@@ -86,31 +57,25 @@ public class MeteorAccess : MonoBehaviour {
         StartCoroutine(LoginCor(email, password, successCallback, failCallback));
     }
 
-    public IEnumerable<UserData> GetUsers() {
-        return usersCursor.Fetch();
+    public class Collection<T> where T : MongoDocument, new() {
+        public System.Action<T> AddedEvent = delegate { };
+        public System.Action<T> ChangedEvent = delegate { };
+        public System.Action<string> RemovedEvent = delegate { };
+
+        private Meteor.Collection<T> collection;
+        private Meteor.Cursor<T> cursor;
+
+        public Collection(string collectionName, Func<T, bool> selector = null) {
+            collection = new Meteor.Collection<T>(collectionName);
+            cursor = collection.Find(selector);
+            cursor.Observe(
+                (addedId, addedObject) => AddedEvent(addedObject),
+                (changedId, changedObject, fuzzyDict, fuzzyStringList) => ChangedEvent(changedObject),
+                (removedId) => RemovedEvent(removedId));
+        }
+
+        public IEnumerable<T> Get() {
+            return cursor.Fetch();
+        }
     }
-
-    public void SetUser(UserData ud) {
-
-    }
-    public System.Action<UserData> UserAddedEvent = delegate { };
-    public System.Action<UserData> UserChangedEvent = delegate { };
-    public System.Action<string> UserRemovedEvent = delegate { };
-
-
-    public IEnumerable<MessageData> GetMessages() {
-        return messagesCursor.Fetch();
-    }
-    public System.Action<MessageData> MessageAddedEvent = delegate { };
-    public System.Action<MessageData> MessageChangedEvent = delegate { };
-    public System.Action<string> MessageRemovedEvent = delegate { };
-
-
-    public IEnumerable<GameAreaData> GetGameAreas() {
-        return gameAreasCursor.Fetch();
-    }
-    public System.Action<GameAreaData> GameAreaAddedEvent = delegate { };
-    public System.Action<GameAreaData> GameAreaChangedEvent = delegate { };
-    public System.Action<string> GameAreaRemovedEvent = delegate { };
-
 }

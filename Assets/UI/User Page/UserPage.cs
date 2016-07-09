@@ -31,7 +31,7 @@ public class UserPage : MonoBehaviour, IDropHandler {
     private void Initialize() {
         if (!mInitialized) {
             mInitialized = true;
-            MeteorAccess.instance.UserChangedEvent += UpdateIfMatching;
+            MeteorAccess.instance.users.ChangedEvent += UpdateIfMatching;
             roleButton.onClick.AddListener(RoleButtonClickHandler);
         }
     }
@@ -44,7 +44,7 @@ public class UserPage : MonoBehaviour, IDropHandler {
     }
 
     void OnDestroy() {
-        MeteorAccess.instance.UserChangedEvent -= UpdateIfMatching;
+        MeteorAccess.instance.users.ChangedEvent -= UpdateIfMatching;
     }
 
     void UpdateIfMatching(UserData ud) {

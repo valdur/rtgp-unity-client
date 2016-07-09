@@ -45,6 +45,6 @@ public class Frame : MonoBehaviour, IDropHandler {
 
     void EnsureUnloaded() {
         if (spawnedWidget)
-            Destroy(spawnedWidget);
+            Destroy(spawnedWidget.gameObject);
     }
 }

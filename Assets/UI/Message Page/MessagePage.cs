@@ -20,7 +20,7 @@ public class MessagePage : MonoBehaviour {
         contentLabel.text = data.content;
         if (!initialized) {
             initialized = true;
-            MeteorAccess.instance.MessageChangedEvent += ReloadIfMatching;
+            MeteorAccess.instance.messages.ChangedEvent += ReloadIfMatching;
         }
     }
 
@@ -30,7 +30,7 @@ public class MessagePage : MonoBehaviour {
     }
 
     void OnDestroy() {
-        MeteorAccess.instance.MessageChangedEvent -= ReloadIfMatching;
+        MeteorAccess.instance.messages.ChangedEvent -= ReloadIfMatching;
     }
 
     public void OnDrop(PointerEventData eventData) {
