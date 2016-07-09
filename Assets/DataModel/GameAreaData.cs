@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 namespace Wtg.DataModel {
 
-    [System.Serializable]
     public class GameAreaData : MongoDocument {
 
         public static string[] areaTypeValues = new string[] {
@@ -17,6 +16,8 @@ namespace Wtg.DataModel {
         public string name;
         public string description;
         public string areaType;
+        public string owner;
+        public string ownerName;
         public float x;
         public float y;
 

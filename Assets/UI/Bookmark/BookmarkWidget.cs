@@ -2,8 +2,9 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System;
 
-public class BookmarkWidget : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler {
+public class BookmarkWidget : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler {
 
 	public Transform prefab;
 	public Text text;
@@ -23,4 +24,8 @@ public class BookmarkWidget : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
 			Destroy(mDragling.gameObject);
 		mDragling = null;
 	}
+
+    public void OnPointerClick(PointerEventData eventData) {
+        Frame.activeFrame.LoadFromBookmarkWidget(this);
+    }
 }

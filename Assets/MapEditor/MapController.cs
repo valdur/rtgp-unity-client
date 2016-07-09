@@ -8,6 +8,7 @@ using System;
 namespace Wtg.MapEditor {
     public class MapController : MonoBehaviour {
 
+
         private Dictionary<string,GameAreaData> regions = new Dictionary<string, GameAreaData>();
         private Dictionary<string, AreaConnectionData> connections = new Dictionary<string, AreaConnectionData>();
         public List<string> selectedRegions = new List<string>();
@@ -20,10 +21,12 @@ namespace Wtg.MapEditor {
         public event System.Action<AreaConnectionData> ConnectionCreatedEvent = delegate { };
         public event System.Action<AreaConnectionData> ConnectionDestroyedEvent = delegate { };
         public event System.Action<AreaConnectionData> ConnectionUpdatedEvent = delegate { };
+        public event System.Action<Texture> BackgroundLoadedEvent = delegate { };
 
         public event System.Action SelectionChangedEvent = delegate { };
 
         public Mode mode { get; private set; }
+        public Texture backgroundTexture { get; private set; }
 
         public void SelectSingle(GameAreaData region) {
             QuietClearSelection();
@@ -49,6 +52,20 @@ namespace Wtg.MapEditor {
                 this.connections[con._id] = con;
                 ConnectionCreatedEvent(con);
             }
+        }
+
+        internal void LoadBackgroundFromUrl(string url) {
+            StartCoroutine(LoadBackgroundCor(url));
+        }
+            
+        private IEnumerator LoadBackgroundCor(string url) {
+            WWW www = new WWW(url);
+            yield return www;
+            if (backgroundTexture)
+                Destroy(backgroundTexture);
+            backgroundTexture = www.texture;
+            BackgroundLoadedEvent(backgroundTexture);
+            RefreshAll();
         }
 
         internal void EnterEditMode() {

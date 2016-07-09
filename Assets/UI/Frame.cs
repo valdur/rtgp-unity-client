@@ -6,16 +6,18 @@ public class Frame : MonoBehaviour, IDropHandler {
 
     private Transform spawnedWidget;
 
+    public static Frame activeFrame;
+
+    public void Awake() {
+        activeFrame = this;
+    }
+
     public void OnDrop(PointerEventData eventData) {
         if (!eventData.pointerDrag)
             return;
         BookmarkWidget bmw = eventData.pointerDrag.GetComponent<BookmarkWidget>();
         if (bmw) {
-            EnsureUnloaded();
-            spawnedWidget = Instantiate(bmw.prefab) as Transform;
-            spawnedWidget.transform.SetParent(transform);
-            var r = spawnedWidget.GetComponent<RectTransform>();
-            r.offsetMin = r.offsetMax = Vector2.zero;
+            LoadFromBookmarkWidget(bmw);
             return;
         }
 
@@ -41,6 +43,14 @@ public class Frame : MonoBehaviour, IDropHandler {
             r.offsetMin = r.offsetMax = Vector2.zero;
             mpi.Load(mpw.messageData);
         }
+    }
+
+    public void LoadFromBookmarkWidget(BookmarkWidget bmw) {
+        EnsureUnloaded();
+        spawnedWidget = Instantiate(bmw.prefab) as Transform;
+        spawnedWidget.transform.SetParent(transform);
+        var r = spawnedWidget.GetComponent<RectTransform>();
+        r.offsetMin = r.offsetMax = Vector2.zero;
     }
 
     void EnsureUnloaded() {

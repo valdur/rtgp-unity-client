@@ -19,6 +19,7 @@ public class MeteorAccess : MonoBehaviour {
     public Collection<UserData> users;
     public Collection<GameAreaData> gameAreas;
     public Collection<AreaConnectionData> areaConnections;
+    public Collection<ActiveUnitData> activeUnits;
 
     IEnumerator ConnectCor(System.Action successCallback, System.Action failCallback) {
         yield return Meteor.Connection.Connect(serverAddress);
@@ -31,6 +32,14 @@ public class MeteorAccess : MonoBehaviour {
         }
     }
 
+    string[] subscriptions = new string[] {
+        "allUsers",
+        "Messages.myMessages",
+        "gameAreas",
+        "AreaConnections",
+        "activeUnits"
+    };
+
     IEnumerator LoginCor(string email, string password, System.Action successCallback, System.Action failCallback) {
         yield return (Coroutine)Meteor.Accounts.LoginWith(email, password);
 
@@ -40,6 +49,10 @@ public class MeteorAccess : MonoBehaviour {
             messages = new Collection<MessageData>("messages", x => x.recipent == Meteor.Accounts.UserId || x.sender == Meteor.Accounts.UserId);
             gameAreas = new Collection<GameAreaData>("game-areas");
             areaConnections = new Collection<AreaConnectionData>("area-connections");
+            activeUnits = new Collection<ActiveUnitData>("active-units");
+
+            foreach (var sub in subscriptions)
+                yield return (Coroutine)Meteor.Subscription.Subscribe(sub);
 
             successCallback();
         } else {

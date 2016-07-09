@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using System;
 using Wtg.DataModel;
+using UnityEngine.UI;
 
 namespace Wtg.MapEditor {
     public class MapCanvas : MonoBehaviour, IPointerClickHandler {
@@ -26,6 +27,9 @@ namespace Wtg.MapEditor {
 
         public MapController mapController;
 
+        [SerializeField]
+        private RawImage background;
+
         private void OnEnable() {
             mapController.SelectionChangedEvent += SelectionChangedHandler;
 
@@ -35,6 +39,18 @@ namespace Wtg.MapEditor {
             mapController.RegionCreatedEvent += CreateRegion;
             mapController.RegionUpdatedEvent += ReloadRegion;
             mapController.RegionDestroyedEvent += DestroyRegion;
+            mapController.BackgroundLoadedEvent += SetBackgroundTexture;
+
+            SetBackgroundTexture(mapController.backgroundTexture);
+        }
+
+        private void SetBackgroundTexture(Texture texture) {
+            background.texture = texture;
+            if (texture != null) {
+                background.rectTransform.sizeDelta = new Vector2(background.texture.width, background.texture.height);
+            } else {
+                background.rectTransform.sizeDelta = new Vector2(2048, 2048);
+            }
         }
 
         private void OnDisable() {
@@ -112,5 +128,6 @@ namespace Wtg.MapEditor {
         public void DeselectAll() {
             mapController.ClearSelection();
         }
+
     }
 }

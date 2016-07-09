@@ -25,7 +25,8 @@ public class MapWidget : MonoBehaviour {
             MeteorAccess.instance.gameAreas.Get(),
             MeteorAccess.instance.areaConnections.Get()
         );
-
+        mapController.LoadBackgroundFromUrl("http://seriousdragon.com/~valdur/r2g5-physical.jpg");
+        mapController.EnterViewMode();
     }
 
     private static void MakeFullWidget(RectTransform rect) {
