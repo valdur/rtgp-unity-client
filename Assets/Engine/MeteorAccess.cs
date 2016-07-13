@@ -37,7 +37,7 @@ public class MeteorAccess : MonoBehaviour {
         "Messages.myMessages",
         "gameAreas",
         "AreaConnections",
-        "activeUnits"
+        "ActiveUnits"
     };
 
     IEnumerator LoginCor(string email, string password, System.Action successCallback, System.Action failCallback) {
@@ -70,6 +70,10 @@ public class MeteorAccess : MonoBehaviour {
         StartCoroutine(LoginCor(email, password, successCallback, failCallback));
     }
 
+    public bool IsAdmin() {
+        return users.Get(Meteor.Accounts.UserId).profile.role == "admin";
+    }
+
     public class Collection<T> where T : MongoDocument, new() {
         public System.Action<T> AddedEvent = delegate { };
         public System.Action<T> ChangedEvent = delegate { };
@@ -87,8 +91,12 @@ public class MeteorAccess : MonoBehaviour {
                 (removedId) => RemovedEvent(removedId));
         }
 
-        public IEnumerable<T> Get() {
+        public IEnumerable<T> GetAll() {
             return cursor.Fetch();
+        }
+
+        public T Get(string id) {
+            return collection.FindOne(id);
         }
     }
 }

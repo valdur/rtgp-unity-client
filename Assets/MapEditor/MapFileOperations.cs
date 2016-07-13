@@ -10,8 +10,6 @@ using System.Linq;
 public class MapFileOperations : MonoBehaviour {
 
     [SerializeField]
-    private FilePicker filePicker;
-    [SerializeField]
     private Button loadButton;
     [SerializeField]
     private Button saveButton;
@@ -22,12 +20,8 @@ public class MapFileOperations : MonoBehaviour {
     [SerializeField]
     private Button viewModeButton;
 
-    [SerializeField]
-    private MapController mapController;
-
-
-    [SerializeField]
-    private RawImage background;
+    public FilePicker filePicker;
+    public MapController mapController;
 
     private string bgFilename;
 
@@ -35,7 +29,7 @@ public class MapFileOperations : MonoBehaviour {
     const string mapExtension = ".rtgmap";
     const string mapSearchPattern = "*.rtgmap";
 
-    private void Awake() {
+    private void Start() {
         EnsureDirectoryExistance();
         loadButton.onClick.AddListener(LoadHandler);
         saveButton.onClick.AddListener(SaveHandler);
@@ -100,13 +94,7 @@ public class MapFileOperations : MonoBehaviour {
     }
 
     private void LoadBackground(string filename) {
-        Destroy(background.texture);
         bgFilename = filename;
-        var bytes = File.ReadAllBytes(GetPath(filename));
-        var tex = new Texture2D(1,1);
-        tex.LoadImage(bytes);
-        background.texture = tex;
-        background.rectTransform.sizeDelta = new Vector2(tex.width, tex.height);
-        mapController.RefreshAll();
+        mapController.LoadBackgroundFromFile(GetPath(filename));
     }
 }
