@@ -54,7 +54,11 @@ public class MapFileOperations : MonoBehaviour {
     }
 
     private void LoadMap(string filename) {
-        MapData md = JsonUtility.FromJson<MapData>(File.ReadAllText(GetPath(filename)));
+        var path = GetPath(filename);
+        Debug.Log(path);
+        File.SetAttributes(path, FileAttributes.Normal);
+        var fileContent = File.ReadAllText(path);
+        MapData md = JsonUtility.FromJson<MapData>(fileContent);
         LoadBackground(md.bgFilename);
         mapController.Load(md.gameAreas, md.areaConnections);
     }
@@ -82,7 +86,11 @@ public class MapFileOperations : MonoBehaviour {
             gameAreas = mapController.GetRegions().ToList(),
             areaConnections = mapController.GetConnections().ToList()
         };
-        File.WriteAllText(GetPath(filename), JsonUtility.ToJson(md));
+
+        var path = GetPath(filename);
+
+        File.WriteAllText(path, JsonUtility.ToJson(md));
+        File.SetAttributes(path, FileAttributes.Normal);
     }
 
     private string GetPath(string filename) {
