@@ -10,7 +10,7 @@ public class UserList : MonoBehaviour {
 
     // Use this for initialization
     void Start() {
-        foreach (var up in MeteorAccess.instance.users.Get()) {
+        foreach (var up in MeteorAccess.instance.users.GetAll()) {
             var uw = Instantiate(userPlateWidget) as UserPlate;
             uw.Load(up);
             uw.transform.SetParent(listContent);

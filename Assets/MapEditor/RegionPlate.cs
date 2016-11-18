@@ -13,6 +13,8 @@ namespace Wtg.MapEditor {
         private Text text;
         [SerializeField]
         private Image bg;
+        [SerializeField]
+        private Image outline;
 
         private bool _selected;
         private bool _potentialClick;
@@ -71,11 +73,25 @@ namespace Wtg.MapEditor {
 
         void SetupColor() {
             if (_selected) {
-                bg.color = canvas.selectedRegionColor;
+                outline.color = canvas.selectedRegionColor;
             } else {
                 int index = System.Array.IndexOf(GameAreaData.areaTypeValues, data.areaType);
-                bg.color = canvas.deselectedRegionColors[index];
+                outline.color = canvas.deselectedRegionColors[index];
             }
+
+            var owner = map.GetUser(data.owner);
+            Color col = Color.white;
+            if (owner != null) {
+                bool res = ColorUtility.TryParseHtmlString(owner.profile.mainColor, out col);
+                if (!res) {
+                    var i = owner._id.GetHashCode() & 0x00FFFFFF;
+                    ColorUtility.TryParseHtmlString("#" + i.ToString("X6"), out col);
+                }
+
+            }
+            bg.color = col;
+
+            text.color = ColorUtils.GetTextColorForBackground(bg.color);
         }
 
         public void OnBeginDrag(PointerEventData eventData) {

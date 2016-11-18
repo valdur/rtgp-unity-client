@@ -65,7 +65,7 @@ namespace Wtg.MapEditor {
 
             rectTransform.localPosition = p1;
 
-            var w = map.IsEditMode() ? canvas.editConnectionThickness : canvas.viewConnectionThickness;
+            var w = canvas.editConnectionThickness;
             var h = Vector3.Distance(p1, p2);
             rectTransform.sizeDelta = new Vector2(w, h);
             rectTransform.rotation = Quaternion.FromToRotation(Vector3.up, p2 - p1);

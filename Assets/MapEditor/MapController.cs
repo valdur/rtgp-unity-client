@@ -4,13 +4,14 @@ using Wtg.DataModel;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using System.IO;
 
 namespace Wtg.MapEditor {
     public class MapController : MonoBehaviour {
 
-
         private Dictionary<string,GameAreaData> regions = new Dictionary<string, GameAreaData>();
         private Dictionary<string, AreaConnectionData> connections = new Dictionary<string, AreaConnectionData>();
+        private Dictionary<string, UserData> users = new Dictionary<string, UserData>();
         public List<string> selectedRegions = new List<string>();
         public List<string> selectedConnections = new List<string>();
         public enum Mode { Edit, View};
@@ -42,9 +43,17 @@ namespace Wtg.MapEditor {
             return mode == Mode.View;
         }
 
-        internal void Load(IEnumerable<GameAreaData> regions, IEnumerable<AreaConnectionData> connections) {
+        internal void Load(IEnumerable<GameAreaData> regions, 
+                IEnumerable<AreaConnectionData> connections,
+                IEnumerable<UserData> users = null) {
             DeleteAll();
-            foreach( var reg in regions) {
+            if (users != null) {
+                foreach (var user in users) {
+                    this.users[user._id] = user;
+                }
+            }
+
+            foreach ( var reg in regions) {
                 this.regions[reg._id] = reg;
                 RegionCreatedEvent(reg);
             }
@@ -57,13 +66,24 @@ namespace Wtg.MapEditor {
         internal void LoadBackgroundFromUrl(string url) {
             StartCoroutine(LoadBackgroundCor(url));
         }
-            
+
+        internal void LoadBackgroundFromFile(string path) {
+            var bytes = File.ReadAllBytes(path);
+            var tex = new Texture2D(1, 1);
+            tex.LoadImage(bytes);
+            LoadBackground(tex);
+        }
+
         private IEnumerator LoadBackgroundCor(string url) {
             WWW www = new WWW(url);
             yield return www;
+            LoadBackground(www.texture);
+        }
+
+        private void LoadBackground(Texture2D tex) {
             if (backgroundTexture)
                 Destroy(backgroundTexture);
-            backgroundTexture = www.texture;
+            backgroundTexture = tex;
             BackgroundLoadedEvent(backgroundTexture);
             RefreshAll();
         }
@@ -84,6 +104,10 @@ namespace Wtg.MapEditor {
 
         internal IEnumerable<AreaConnectionData> GetConnections() {
             return connections.Values;
+        }
+
+        internal IEnumerable<UserData> GetUsers() {
+            return users.Values.OrderBy(x => x.username);
         }
 
         public void RefreshAll() {
@@ -160,6 +184,12 @@ namespace Wtg.MapEditor {
             return connections[id];
         }
 
+        public UserData GetUser(string id) {
+            if (string.IsNullOrEmpty(id))
+                return null;
+            return users[id];
+        }
+
         public bool IsRegionSelected(string id) {
             return selectedRegions.Contains(id);
         }
@@ -202,6 +232,7 @@ namespace Wtg.MapEditor {
                 RegionDestroyedEvent(reg);
             }
 
+            users.Clear();
             regions.Clear();
             connections.Clear();
             selectedRegions.Clear();

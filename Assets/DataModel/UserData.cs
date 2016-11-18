@@ -10,6 +10,8 @@ namespace Wtg.DataModel {
 
         public class Profile {
             public string role;
+            public string mainColor;
+            public string secondaryColor;
         }
     }
 }

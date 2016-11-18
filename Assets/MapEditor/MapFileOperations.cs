@@ -10,8 +10,6 @@ using System.Linq;
 public class MapFileOperations : MonoBehaviour {
 
     [SerializeField]
-    private FilePicker filePicker;
-    [SerializeField]
     private Button loadButton;
     [SerializeField]
     private Button saveButton;
@@ -22,12 +20,8 @@ public class MapFileOperations : MonoBehaviour {
     [SerializeField]
     private Button viewModeButton;
 
-    [SerializeField]
-    private MapController mapController;
-
-
-    [SerializeField]
-    private RawImage background;
+    public FilePicker filePicker;
+    public MapController mapController;
 
     private string bgFilename;
 
@@ -35,7 +29,7 @@ public class MapFileOperations : MonoBehaviour {
     const string mapExtension = ".rtgmap";
     const string mapSearchPattern = "*.rtgmap";
 
-    private void Awake() {
+    private void Start() {
         EnsureDirectoryExistance();
         loadButton.onClick.AddListener(LoadHandler);
         saveButton.onClick.AddListener(SaveHandler);
@@ -60,7 +54,11 @@ public class MapFileOperations : MonoBehaviour {
     }
 
     private void LoadMap(string filename) {
-        MapData md = JsonUtility.FromJson<MapData>(File.ReadAllText(GetPath(filename)));
+        var path = GetPath(filename);
+        Debug.Log(path);
+        File.SetAttributes(path, FileAttributes.Normal);
+        var fileContent = File.ReadAllText(path);
+        MapData md = JsonUtility.FromJson<MapData>(fileContent);
         LoadBackground(md.bgFilename);
         mapController.Load(md.gameAreas, md.areaConnections);
     }
@@ -88,7 +86,11 @@ public class MapFileOperations : MonoBehaviour {
             gameAreas = mapController.GetRegions().ToList(),
             areaConnections = mapController.GetConnections().ToList()
         };
-        File.WriteAllText(GetPath(filename), JsonUtility.ToJson(md));
+
+        var path = GetPath(filename);
+
+        File.WriteAllText(path, JsonUtility.ToJson(md));
+        File.SetAttributes(path, FileAttributes.Normal);
     }
 
     private string GetPath(string filename) {
@@ -100,13 +102,7 @@ public class MapFileOperations : MonoBehaviour {
     }
 
     private void LoadBackground(string filename) {
-        Destroy(background.texture);
         bgFilename = filename;
-        var bytes = File.ReadAllBytes(GetPath(filename));
-        var tex = new Texture2D(1,1);
-        tex.LoadImage(bytes);
-        background.texture = tex;
-        background.rectTransform.sizeDelta = new Vector2(tex.width, tex.height);
-        mapController.RefreshAll();
+        mapController.LoadBackgroundFromFile(GetPath(filename));
     }
 }
