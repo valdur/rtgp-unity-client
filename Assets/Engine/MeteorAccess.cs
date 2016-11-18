@@ -41,6 +41,9 @@ public class MeteorAccess : MonoBehaviour {
     };
 
     IEnumerator LoginCor(string email, string password, System.Action successCallback, System.Action failCallback) {
+
+        Debug.Log("Logging in");
+
         yield return (Coroutine)Meteor.Accounts.LoginWith(email, password);
 
         if (Meteor.Accounts.IsLoggedIn) {
@@ -54,8 +57,13 @@ public class MeteorAccess : MonoBehaviour {
             foreach (var sub in subscriptions)
                 yield return (Coroutine)Meteor.Subscription.Subscribe(sub);
 
+            Debug.Log("Logged In");
+
             successCallback();
         } else {
+
+            Debug.Log("Not logged in");
+
             failCallback();
         }
     }

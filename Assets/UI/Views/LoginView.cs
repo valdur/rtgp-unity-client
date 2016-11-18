@@ -19,8 +19,6 @@ public class LoginView : View {
     public void Start() {
         loginFailedLabel.gameObject.SetActive(false);
         loginButton.onClick.AddListener(Login);
-
-        MeteorAccess.instance.Login("valdur", "fdsafdsa", LoginSuccessfulHandler, LoginFailedHandler);
     }
 
     public void Login() {
